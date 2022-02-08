@@ -1,58 +1,163 @@
+/* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
+const ClientError = require('../../exceptions/ClientError');
+
 class SongsHandler {
-  constructor(service) {
+  constructor(service, validator) {
     this._service = service;
+    this._validator = validator;
 
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
     this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
-    this.DeleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
+    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
 
-  postSongHandler(request, h) {
-    const response = h.response({
-      status: 'success',
-      message: 'ok',
-    });
-    response.code(201);
-    return response;
+  async postSongHandler(request, h) {
+    try {
+      this._validator.validateSongPayload(request.payload);
+
+      const {title, year, genre, performer, duration, albumId} = request.payload;
+
+      const songId = await this._service.addSong({title, year, genre, performer, duration, albumId});
+
+      const response = h.response({
+        status: 'success',
+        data: {
+          songId,
+        },
+      });
+      response.code(201);
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'error',
+        message: 'Sorry, there\'s internal server error',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 
-  getSongsHandler(request, h) {
-    const response = h.response({
+  async getSongsHandler() {
+    const songs = await this._service.getSongs();
+    return {
       status: 'success',
-      message: 'ok',
-    });
-    response.code(201);
-    return response;
+      data: {
+        songs,
+      },
+    };
   }
 
-  getSongByIdHandler(request, h) {
-    const response = h.response({
-      status: 'success',
-      message: 'ok',
-    });
-    response.code(201);
-    return response;
+  async getSongByIdHandler(request, h) {
+    try {
+      const {id} = request.params;
+      const song = await this._service.getSongById(id);
+      return {
+        status: 'success',
+        data: {
+          song: {
+            id: song.id,
+            title: song.title,
+            year: song.year,
+            performer: song.performer,
+            genre: song.genre,
+            duration: song.duration,
+            albumId: song.album_id,
+          },
+        },
+      };
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'error',
+        message: 'Sorry, there\'s internal server error',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 
-  putSongByIdHandler(request, h) {
-    const response = h.response({
-      status: 'success',
-      message: 'ok',
-    });
-    response.code(201);
-    return response;
+  async putSongByIdHandler(request, h) {
+    try {
+      this._validator.validateSongPayload(request.payload);
+      const {title, year, genre, performer, duration, albumId} = request.payload;
+      const {id} = request.params;
+      await this._service.editSongById(id, {title, year, genre, performer, duration, albumId});
+
+      return {
+        status: 'success',
+        message: 'Song data edited successfully',
+      };
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
+      const response = h.response({
+        status: 'error',
+        message: 'Sorry, there\'s internal server error',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 
-  deleteSongByIdHandler(request, h) {
-    const response = h.response({
-      status: 'success',
-      message: 'ok',
-    });
-    response.code(201);
-    return response;
+  async deleteSongByIdHandler(request, h) {
+    try {
+      const {id} = request.params;
+      await this._service.deleteSongById(id);
+
+      return {
+        status: 'success',
+        message: 'Song deleted successfully',
+      };
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
+      const response = h.response({
+        status: 'error',
+        message: 'Sorry, there\'s internal server error',
+      });
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 }
 

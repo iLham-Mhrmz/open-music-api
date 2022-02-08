@@ -42,7 +42,7 @@ class AlbumsHandler {
 
       const response = h.response({
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
+        message: 'Sorry, there\'s internal server error',
       });
       response.code(500);
       console.error(error);
@@ -114,7 +114,7 @@ class AlbumsHandler {
       // Server ERROR!
       const response = h.response({
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
+        message: 'Sorry, there\'s internal server error',
       });
       response.code(500);
       console.error(error);
@@ -144,7 +144,7 @@ class AlbumsHandler {
       // Server ERROR!
       const response = h.response({
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
+        message: 'Sorry, there\'s internal server error',
       });
       response.code(500);
       console.error(error);

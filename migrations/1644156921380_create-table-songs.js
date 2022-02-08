@@ -36,10 +36,13 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notnull: true,
     },
+    duration: {
+      type: 'INTEGER',
+      notnull: false,
+    },
     album_id: {
       type: 'VARCHAR(50)',
       notnull: true,
-      references: '"albums"',
     },
   });
 };
