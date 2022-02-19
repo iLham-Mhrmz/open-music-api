@@ -18,7 +18,6 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    console.log(result);
 
     if (!result.rows[0].id) {
       throw new InvariantError('Failed to add album');
