@@ -18,6 +18,9 @@ const AuthValidator = require('./validator/authentications');
 const playlists = require('./api/playlists');
 const PlaylistService = require('./services/postgres/PlaylistService');
 const PlaylistsValidator = require('./validator/playlists');
+const _exports = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
 
 const init = async () => {
   const albumsService = new AlbumsService();
@@ -100,6 +103,14 @@ const init = async () => {
     },
   });
 
+  await server.register({
+    plugin: _exports,
+    options: {
+      playlistService,
+      service: ProducerService,
+      validator: ExportsValidator,
+    },
+  });
   await server.start();
   console.log(`Server running on ${server.info.uri}`);
 };
