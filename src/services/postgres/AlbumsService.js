@@ -33,16 +33,15 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const query = {
-      text: 'SELECT * FROM albums WHERE id = $1',
+      // eslint-disable-next-line max-len
+      text: 'SELECT id, name, year, coverurl as "coverUrl" FROM albums WHERE id = $1',
       values: [id],
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows.length) {
       throw new NotFoundError('Album NOT FOUND!');
     }
-
     return result.rows[0];
   }
 
@@ -67,6 +66,19 @@ class AlbumsService {
     const result = await this._pool.query(query);
     if (!result.rows.length) {
       throw new NotFoundError('Album delete failed, album id NOT FOUND');
+    }
+  }
+
+  async addAlbumCover(id, filename) {
+    console.log(id);
+    const query = {
+      text: 'UPDATE albums SET coverurl = $1 WHERE id = $2 RETURNING id',
+      values: [filename, id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError('Album cover upload failed, album id not found');
     }
   }
 }
