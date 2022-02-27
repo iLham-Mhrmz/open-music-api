@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
 const {Pool} = require('pg');
 const {nanoid} = require('nanoid');
@@ -33,7 +34,6 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const query = {
-      // eslint-disable-next-line max-len
       text: 'SELECT id, name, year, coverurl as "coverUrl" FROM albums WHERE id = $1',
       values: [id],
     };
